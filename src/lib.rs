@@ -1,10 +1,10 @@
+#![feature(must_not_suspend)]
 use js_sys::Function;
 use js_sys::JSON;
 use js_sys::Promise;
 use wasm_bindgen::{JsCast, prelude::*};
-use wasm_bindgen_futures::JsFuture;
-use web_sys::IdbObjectStore;
 use web_sys::IdbOpenDbRequest;
+use web_sys::IdbRequest;
 use web_sys::window;
 use web_sys::console;
 use web_sys::Event;
@@ -12,35 +12,38 @@ use web_sys::IdbDatabase;
 use web_sys::IdbTransactionMode;
 use js_sys::Array;
 
+#[must_not_suspend]
+pub struct Canary {
+
+}
+
 pub async fn sleep(timeout: i32) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
-    let promise = Promise::new(&mut |resolve, reject| {
+    let promise = Promise::new(&mut |resolve, _reject| {
         window().unwrap().set_timeout_with_callback_and_timeout_and_arguments_0(&resolve, timeout).unwrap();
     });
     let result = wasm_bindgen_futures::JsFuture::from(promise);
     result.await
 }
 
-pub async fn put_with_key(object_store: &IdbObjectStore, js_value: &JsValue, key: &JsValue) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
+pub async fn wrap(_: Canary, request: IdbRequest) -> (Canary, Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue>) {
     let promise = Promise::new(&mut |resolve, reject| {
-        let request = object_store.put_with_key(js_value, key).unwrap();
-
         request.set_onsuccess(Some(&resolve));
         request.set_onerror(Some(&reject));
     });
 
-    let result = wasm_bindgen_futures::JsFuture::from(promise);
-    result.await
+    let result = wasm_bindgen_futures::JsFuture::from(promise).await;
+    (Canary {}, result)
 }
 
 pub async fn open(name: &str, version: u32) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
-    let promise = Promise::new(&mut |resolve: Function, reject: Function| {
+    let promise = Promise::new(&mut |resolve: Function, _reject: Function| {
 
         let window = window().unwrap();
         let idb = window.indexed_db().unwrap().unwrap();
 
         let open_request = idb.open_with_u32(name, version).unwrap();
 
-        let onsuccess = Closure::wrap(Box::new(|event: Event| {
+        let onsuccess = Closure::wrap(Box::new(|_event: Event| {
            
         }) as Box<dyn FnMut(Event)>);
 
@@ -89,11 +92,22 @@ pub async fn greet() {
 
     let object_store = transaction.object_store("test").unwrap();
 
-    put_with_key(&object_store, &JSON::parse(r#"{"id":1}"#).unwrap(), &JsValue::from_f64(1.0)).await.unwrap();
+    let value = {
+        let canary1 = Canary {};
+        let request = object_store.put_with_key(&JSON::parse(r#"{"id":1}"#).unwrap(), &JsValue::from_f64(1.0)).unwrap();
+        wrap(canary1, request)
+    };
+    let value = {
+        let (canary2, result) = value.await;
+        result.unwrap();
 
-    sleep(5000).await.unwrap();
+        //sleep(5000).await.unwrap();
 
-    put_with_key(&object_store, &JSON::parse(r#"{"id":2}"#).unwrap(), &JsValue::from_f64(2.0)).await.unwrap();
+        let request = object_store.put_with_key(&JSON::parse(r#"{"id":2}"#).unwrap(), &JsValue::from_f64(2.0)).unwrap();
+        wrap(canary2, request)
+    };
+    let (_, result) = value.await;
+    result.unwrap();
 
     console::log_1(&format!("Done!").into());
 }
