@@ -101,7 +101,7 @@ pub async fn greet() {
         let (canary2, result) = value.await;
         result.unwrap();
 
-        //sleep(5000).await.unwrap();
+        //sleep(1000).await.unwrap();
 
         let request = object_store.put_with_key(&JSON::parse(r#"{"id":2}"#).unwrap(), &JsValue::from_f64(2.0)).unwrap();
         wrap(canary2, request)
