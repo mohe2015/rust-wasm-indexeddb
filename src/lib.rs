@@ -12,6 +12,14 @@ use web_sys::IdbDatabase;
 use web_sys::IdbTransactionMode;
 use js_sys::Array;
 
+pub async fn sleep(timeout: i32) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
+    let promise = Promise::new(&mut |resolve, reject| {
+        window().unwrap().set_timeout_with_callback_and_timeout_and_arguments_0(&resolve, timeout).unwrap();
+    });
+    let result = wasm_bindgen_futures::JsFuture::from(promise);
+    result.await
+}
+
 pub async fn put_with_key(object_store: &IdbObjectStore, js_value: &JsValue, key: &JsValue) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
     let promise = Promise::new(&mut |resolve, reject| {
         let request = object_store.put_with_key(js_value, key).unwrap();
@@ -82,6 +90,8 @@ pub async fn greet() {
     let object_store = transaction.object_store("test").unwrap();
 
     put_with_key(&object_store, &JSON::parse(r#"{"id":1}"#).unwrap(), &JsValue::from_f64(1.0)).await.unwrap();
+
+    sleep(5000).await.unwrap();
 
     put_with_key(&object_store, &JSON::parse(r#"{"id":2}"#).unwrap(), &JsValue::from_f64(2.0)).await.unwrap();
 
