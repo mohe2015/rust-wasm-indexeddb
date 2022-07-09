@@ -2,6 +2,7 @@
 use js_sys::Function;
 use js_sys::JSON;
 use js_sys::Promise;
+use log::debug;
 use log::info;
 use wasm_bindgen::{JsCast, prelude::*};
 use web_sys::IdbOpenDbRequest;
@@ -78,20 +79,18 @@ pub async fn open(name: &str, version: u32) -> Result<wasm_bindgen::JsValue, was
 #[wasm_bindgen]
 pub async fn greet() {
     console_error_panic_hook::set_once();
-    console_log::init_with_level(Level::Debug).unwrap();
+    console_log::init_with_level(Level::Trace).unwrap();
 
     info!("tes43");
 
-    console::log_1(&format!("Hello2!").into());
-
     let event = open("test", 2).await.unwrap().dyn_into::<Event>().unwrap();
 
-    console::log_1( &event);
+    debug!("{:#?}", &event);
     let target = event.target().unwrap();
     let new_open_request: IdbOpenDbRequest = target.dyn_into::<IdbOpenDbRequest>().unwrap();
 
     let db = new_open_request.result().unwrap().dyn_into::<IdbDatabase>().unwrap();
-    console::log_1( &db);
+    debug!("{:#?}", &db);
 
     let store_names = JsValue::from(Array::from_iter([JsValue::from("test")].iter()));
 

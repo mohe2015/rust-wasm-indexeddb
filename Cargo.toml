@@ -16,4 +16,4 @@ web-sys = { version = "0.3", features = ["console", "Window", "IdbFactory", "Idb
 wasm-bindgen-futures = "0.4"
 console_error_panic_hook = "0.1"
 log = "0.4"
-console_log = "0.2"
+console_log = { version = "0.2", features = ["color"] }
