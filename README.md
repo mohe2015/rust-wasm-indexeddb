@@ -4,6 +4,8 @@
 cargo install wasm-pack
 ~/.cargo/bin/wasm-pack build --target web
 npx http-server
+
+cargo build --target wasm32-unknown-unknown
 ```
 
 https://github.com/rustwasm/wasm-bindgen/pull/2012

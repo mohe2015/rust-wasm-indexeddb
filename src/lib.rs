@@ -11,6 +11,9 @@ use web_sys::Event;
 use web_sys::IdbDatabase;
 use web_sys::IdbTransactionMode;
 use js_sys::Array;
+use log::Level;
+
+// https://rustwasm.github.io/docs/book/introduction.html
 
 #[must_not_suspend]
 pub struct Canary {
@@ -74,6 +77,7 @@ pub async fn open(name: &str, version: u32) -> Result<wasm_bindgen::JsValue, was
 #[wasm_bindgen]
 pub async fn greet() {
     console_error_panic_hook::set_once();
+    console_log::init_with_level(Level::Debug).unwrap();
 
     console::log_1(&format!("Hello!").into());
 
