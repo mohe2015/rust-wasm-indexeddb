@@ -2,10 +2,10 @@
 
 ```
 cargo install wasm-pack
-~/.cargo/bin/wasm-pack build --target web
+# https://rustwasm.github.io/wasm-pack/book/commands/build.html
+~/.cargo/bin/wasm-pack build --dev --target web
 npx http-server
 
-cargo build --target wasm32-unknown-unknown
 ```
 
 https://github.com/rustwasm/wasm-bindgen/pull/2012
