@@ -53,13 +53,13 @@ pub async fn open(name: &str, version: u32) -> Result<wasm_bindgen::JsValue, was
         }) as Box<dyn FnMut(Event)>);
 
         let onupgradeneeded = Closure::wrap(Box::new(|event: Event| {
-            console::log_1( &event);
+            debug!("{:#?}", &event);
             //let result = idbRequest.result().unwrap();
             let target = event.target().unwrap();
             let new_open_request: IdbOpenDbRequest = target.dyn_into::<IdbOpenDbRequest>().unwrap();
 
             let db = new_open_request.result().unwrap().dyn_into::<IdbDatabase>().unwrap();
-            console::log_1( &db);
+            debug!("{:#?}", &db);
 
             let _object_store = db.create_object_store("test").unwrap();
         }) as Box<dyn FnMut(Event)>);
@@ -115,5 +115,5 @@ pub async fn greet() {
     let (_, result) = value.await;
     result.unwrap();
 
-    console::log_1(&format!("Done!").into());
+    debug!("Done!");
 }

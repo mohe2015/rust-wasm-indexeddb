@@ -10,6 +10,8 @@ npx http-server -c-1 --brotli
 https://github.com/rustwasm/wasm-bindgen/pull/2012
 https://github.com/rustwasm/wasm-bindgen/releases/tag/0.2.59
 
+https://rustwasm.github.io/wasm-bindgen/examples/todomvc.html
+
 ```json
 {
    "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
