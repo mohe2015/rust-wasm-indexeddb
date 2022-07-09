@@ -2,6 +2,7 @@
 use js_sys::Function;
 use js_sys::JSON;
 use js_sys::Promise;
+use log::info;
 use wasm_bindgen::{JsCast, prelude::*};
 use web_sys::IdbOpenDbRequest;
 use web_sys::IdbRequest;
@@ -79,7 +80,9 @@ pub async fn greet() {
     console_error_panic_hook::set_once();
     console_log::init_with_level(Level::Debug).unwrap();
 
-    console::log_1(&format!("Hello!").into());
+    info!("tes43");
+
+    console::log_1(&format!("Hello2!").into());
 
     let event = open("test", 2).await.unwrap().dyn_into::<Event>().unwrap();
 
